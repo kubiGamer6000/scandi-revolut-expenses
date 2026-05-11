@@ -1,0 +1,53 @@
+# DigitalOcean App Platform spec.
+# Deploy via `doctl apps create --spec .do/app.yaml`, or paste this into the
+# App Platform UI when connecting the GitHub repo.
+#
+# Notes:
+# - We use the Dockerfile in the repo root so the runtime is identical to
+#   what you can run locally with `docker build . && docker run`.
+# - `health_check` calls /health (unauthenticated) so the platform can
+#   restart the container if it stops responding.
+# - The `data_volume` block mounts a small persistent disk at /data so the
+#   OAuth refresh-token cache survives redeploys/restarts. Without it, every
+#   restart would re-read the bootstrap REVOLUT_REFRESH_TOKEN env var, which
+#   gets stale once Revolut rotates the refresh token.
+name: revolut-expense-reports
+region: fra
+services:
+  - name: api
+    dockerfile_path: Dockerfile
+    source_dir: /
+    github:
+      branch: main
+      deploy_on_push: true
+      # repo: your-github-username/scandi-revolut-expenses   # set in UI
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 8080
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 10
+      period_seconds: 30
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    routes:
+      - path: /
+    envs:
+      # ---- Auth ----
+      - { key: REVOLUT_BASE_URL,        scope: RUN_AND_BUILD_TIME, value: "https://b2b.revolut.com/api/1.0" }
+      - { key: REVOLUT_CLIENT_ID,       scope: RUN_TIME, type: SECRET, value: "EXAMPLE_REPLACE_ME" }
+      - { key: REVOLUT_JWT_ISSUER,      scope: RUN_TIME, type: SECRET, value: "https://your-host.example" }
+      - { key: REVOLUT_PRIVATE_KEY,     scope: RUN_TIME, type: SECRET, value: "-----BEGIN PRIVATE KEY-----\\n...\\n-----END PRIVATE KEY-----" }
+      - { key: REVOLUT_REFRESH_TOKEN,   scope: RUN_TIME, type: SECRET, value: "oa_prod_..." }
+      # ---- API & runtime ----
+      - { key: API_KEYS,                scope: RUN_TIME, type: SECRET, value: "GENERATE_WITH_OPENSSL_RAND_HEX_32" }
+      - { key: ANTHROPIC_API_KEY,       scope: RUN_TIME, type: SECRET, value: "sk-ant-..." }
+      - { key: REPORT_TZ,               scope: RUN_AND_BUILD_TIME, value: "Europe/Stockholm" }
+      - { key: DATA_DIR,                scope: RUN_AND_BUILD_TIME, value: "/data" }
+    # 1 GiB is plenty: a year of FX cache + merchant cache + tokens is < 1 MiB.
+    # Persistent disks are only available on Pro plans; on Basic, redeploys
+    # will reset /data and you'll need to re-prime the refresh token via env.
+    # data_volume:
+    #   path: /data
+    #   size: 1GiB

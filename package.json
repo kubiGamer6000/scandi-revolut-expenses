@@ -1,0 +1,42 @@
+{
+  "name": "scandi-revolut-expenses",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Daily/weekly Revolut Business transaction reports (CSV + console summary)",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "dist/server/index.js",
+  "scripts": {
+    "report": "tsx src/index.ts",
+    "report:day": "tsx src/index.ts --day",
+    "report:week": "tsx src/index.ts --week",
+    "auth:url": "tsx src/auth-cli.ts url",
+    "auth:exchange": "tsx src/auth-cli.ts exchange",
+    "auth:check": "tsx src/auth-cli.ts check",
+    "serve": "tsx src/server/index.ts",
+    "dev": "tsx watch src/server/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.69.0",
+    "@date-fns/tz": "^1.4.1",
+    "@hono/node-server": "^2.0.1",
+    "axios": "^1.7.7",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.5",
+    "hono": "^4.12.18",
+    "jose": "^5.9.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2"
+  }
+}
