@@ -20,6 +20,7 @@ RUN npm ci --omit=dev && npm cache clean --force
 FROM node:22-alpine AS runtime
 ENV NODE_ENV=production \
     PORT=8080 \
+    HOST=0.0.0.0 \
     DATA_DIR=/data
 WORKDIR /app
 

@@ -121,12 +121,17 @@ export async function preprocess(
 
       if (tx.state === "declined" || tx.state === "failed") {
         declined.push(pre);
-      } else if (tx.state === "completed") {
+      } else if (
+        tx.state === "completed" ||
+        tx.state === "pending" ||
+        tx.state === "created"
+      ) {
+        // Include pending/created alongside completed — for a spending report
+        // you want today's Uber and subscriptions even before they settle.
+        // `reverted` is still excluded because it nets to zero.
         if (pre.direction === "outgoing") outgoing.push(pre);
         else incoming.push(pre);
       }
-      // Other states (pending, created, reverted) are ignored — pending is
-      // not yet money out, and reverted nets to zero with its refund leg.
     }
   }
 

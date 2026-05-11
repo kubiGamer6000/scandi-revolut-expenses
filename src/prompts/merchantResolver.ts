@@ -82,6 +82,9 @@ INSTRUCTIONS:
 /**
  * Calls Claude Opus 4.7 with structured outputs. The grammar guarantees
  * a valid array of {raw, canonical_name, category, is_alias_of_existing}.
+ *
+ * Retries up to MAX_RETRIES times on transient server errors (5xx) and
+ * overload errors, with exponential back-off + jitter.
  */
 export async function callMerchantResolver(
   client: Anthropic,
@@ -108,39 +111,76 @@ export async function callMerchantResolver(
   // Allow ~150 tokens per merchant + 200 overhead. Cap at 16k.
   const maxTokens = Math.min(16_000, 200 + unknowns.length * 150);
 
-  // The SDK type for `output_config.format` accepts the JSON schema variant
-  // but isn't fully typed for the `enum` shape we use; cast the request.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const response = await client.messages.create({
-    model: "claude-opus-4-7",
-    max_tokens: maxTokens,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content: userMessage }],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    output_config: {
-      format: {
-        type: "json_schema",
-        schema: RESOLVER_SCHEMA,
-      },
-    },
-  } as Anthropic.MessageCreateParamsNonStreaming & Record<string, unknown>);
+  const MAX_RETRIES = 3;
+  // Base delay 1 s, doubles each attempt, ±30 % jitter.
+  const BASE_DELAY_MS = 1_000;
 
-  if (response.stop_reason === "refusal") {
-    throw new Error(
-      "Claude refused to categorize merchants. This shouldn't happen for benign business names — investigate the input.",
-    );
-  }
-  if (response.stop_reason === "max_tokens") {
-    throw new Error(
-      `Claude hit max_tokens (${maxTokens}) while categorizing merchants. Reduce batch size or raise the cap.`,
-    );
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      const delay = BASE_DELAY_MS * 2 ** (attempt - 1);
+      const jitter = delay * 0.3 * (Math.random() * 2 - 1);
+      const wait = Math.round(delay + jitter);
+      console.error(
+        `  Anthropic error (attempt ${attempt}/${MAX_RETRIES}), retrying in ${wait} ms…`,
+      );
+      await sleep(wait);
+    }
+
+    try {
+      // The SDK type for `output_config.format` accepts the JSON schema variant
+      // but isn't fully typed for the `enum` shape we use; cast the request.
+      const response = await client.messages.create({
+        model: "claude-opus-4-7",
+        max_tokens: maxTokens,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: userMessage }],
+        output_config: {
+          format: {
+            type: "json_schema",
+            schema: RESOLVER_SCHEMA,
+          },
+        },
+      } as Anthropic.MessageCreateParamsNonStreaming & Record<string, unknown>);
+
+      if (response.stop_reason === "refusal") {
+        throw new Error(
+          "Claude refused to categorize merchants. This shouldn't happen for benign business names — investigate the input.",
+        );
+      }
+      if (response.stop_reason === "max_tokens") {
+        throw new Error(
+          `Claude hit max_tokens (${maxTokens}) while categorizing merchants. Reduce batch size or raise the cap.`,
+        );
+      }
+
+      const textBlock = response.content.find((b) => b.type === "text");
+      if (!textBlock || textBlock.type !== "text") {
+        throw new Error("Claude response had no text block");
+      }
+
+      return JSON.parse(textBlock.text) as ResolverResponse;
+    } catch (err) {
+      lastErr = err;
+      // Only retry on transient errors: 5xx status codes or Anthropic's
+      // InternalServerError / OverloadedError types.
+      if (!isRetryable(err) || attempt === MAX_RETRIES) throw err;
+    }
   }
 
-  const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock || textBlock.type !== "text") {
-    throw new Error("Claude response had no text block");
-  }
+  // Unreachable, but keeps TypeScript happy.
+  throw lastErr;
+}
 
-  const parsed = JSON.parse(textBlock.text) as ResolverResponse;
-  return parsed;
+function isRetryable(err: unknown): boolean {
+  if (err instanceof Anthropic.InternalServerError) return true;
+  // APIError carries a numeric `status`; 5xx are all retryable server-side issues.
+  if (err instanceof Anthropic.APIError && (err.status ?? 0) >= 500) return true;
+  // Belt-and-braces: catch overload / 529 by message for future SDK versions.
+  if (err instanceof Error && /overload|529|internal.server/i.test(err.message)) return true;
+  return false;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

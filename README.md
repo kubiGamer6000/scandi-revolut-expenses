@@ -7,7 +7,9 @@ two ways:
 - **HTTP API** (`npm run serve`) — for everything else: cron jobs, the
   WhatsApp bot, dashboards, Slack/email automations. Deployable to
   DigitalOcean App Platform straight from this repo. See
-  [`docs/API.md`](docs/API.md).
+  [`docs/API.md`](docs/API.md) for the API contract and
+  [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the bare-metal-on-droplet
+  setup we run alongside `scandi-wa-bot` and `scandi-jarvis`.
 
 Both share the same pipeline (`src/pipeline/run.ts`), so the numbers in your
 WhatsApp message are exactly what you'd see in a local CLI dump.

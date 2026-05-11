@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-05-07T23:12:22.550Z",
+  "updated_at": "2026-05-11T23:10:13.065Z",
   "merchants": {
     "Adobe": {
       "category": "saas_subscriptions",
@@ -8,7 +8,16 @@
         "adobe"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-06",
+      "last_seen": "2026-05-11",
+      "manual_override": false
+    },
+    "Amazon": {
+      "category": "other",
+      "aliases": [
+        "amazon"
+      ],
+      "first_seen": "2026-05-11",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "Amazon Prime": {
@@ -17,7 +26,7 @@
         "amazon prime"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-06",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "Anthropic": {
@@ -74,6 +83,15 @@
       "last_seen": "2026-05-06",
       "manual_override": false
     },
+    "Bart-Jan Kroes": {
+      "category": "contractors_payroll",
+      "aliases": [
+        "to bart-jan kroes"
+      ],
+      "first_seen": "2026-05-11",
+      "last_seen": "2026-05-11",
+      "manual_override": false
+    },
     "Bokio": {
       "category": "saas_subscriptions",
       "aliases": [
@@ -125,7 +143,16 @@
         "cloudflare"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-06",
+      "last_seen": "2026-05-11",
+      "manual_override": false
+    },
+    "Cursor": {
+      "category": "saas_subscriptions",
+      "aliases": [
+        "cursor"
+      ],
+      "first_seen": "2026-05-11",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "DigitalOcean": {
@@ -152,7 +179,16 @@
         "to elias owhaib"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-06",
+      "last_seen": "2026-05-11",
+      "manual_override": false
+    },
+    "Elite Cleaners": {
+      "category": "other",
+      "aliases": [
+        "www.elitecleaners.eu"
+      ],
+      "first_seen": "2026-05-11",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "eSIM Plans": {
@@ -188,7 +224,7 @@
         "freepik company"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-06",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "GoDaddy": {
@@ -207,7 +243,7 @@
         "google ads"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-07",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "Google Cloud": {
@@ -234,7 +270,7 @@
         "google workspace"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-07",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "Hangzhou Panda E-commerce": {
@@ -243,7 +279,7 @@
         "to hang zhou pan da dian zi shang wu you xian gong si"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-07",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "Higgsfield": {
@@ -261,7 +297,7 @@
         "to javid jabbarli"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-07",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "Juni Technology": {
@@ -342,7 +378,16 @@
         "shopify"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-06",
+      "last_seen": "2026-05-11",
+      "manual_override": false
+    },
+    "Sikom Market": {
+      "category": "other",
+      "aliases": [
+        "sikom market"
+      ],
+      "first_seen": "2026-05-11",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "Skånetrafiken": {
@@ -379,7 +424,7 @@
         "payment from stripe technology europe ltd"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-07",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "Stroykontrol EOOD": {
@@ -433,7 +478,7 @@
         "trustpilot"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-07",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "Typesense Cloud": {
@@ -451,7 +496,7 @@
         "uber"
       ],
       "first_seen": "2026-05-06",
-      "last_seen": "2026-05-07",
+      "last_seen": "2026-05-11",
       "manual_override": false
     },
     "WeTracked": {

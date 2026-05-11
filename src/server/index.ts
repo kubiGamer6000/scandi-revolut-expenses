@@ -15,9 +15,13 @@ if (config.apiKeys.length === 0) {
 
 const app = createApp({ config });
 const port = config.port;
+// Default to loopback so the server is never accidentally exposed to the
+// internet on a vanilla VM. Set HOST=0.0.0.0 in container envs (DO App
+// Platform, Docker, etc.) where the platform terminates TLS upstream.
+const hostname = process.env.HOST?.trim() || "127.0.0.1";
 
-serve({ fetch: app.fetch, port }, (info) => {
-  console.log(`▶ revolut-reports API listening on http://0.0.0.0:${info.port}`);
+serve({ fetch: app.fetch, port, hostname }, (info) => {
+  console.log(`▶ revolut-reports API listening on http://${hostname}:${info.port}`);
   console.log(
     `  env=${config.baseUrl.includes("sandbox") ? "sandbox" : "production"}` +
       ` · tz=${config.reportTz}` +
