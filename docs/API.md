@@ -98,7 +98,7 @@ Booleans accept `true/false`, `1/0`, `yes/no`, `on/off`.
 | `Content-Type`        | `text/html`, `text/csv`, `text/markdown`, `application/json` |
 | `Content-Disposition` | `inline; filename="…"` or `attachment; …` if `download=true` |
 | `X-Tx-Count`          | Number of transactions in the response         |
-| `X-Period`            | Resolved human period label (`Yesterday (06/05/2026)`) |
+| `X-Period`            | Resolved human period label (`Yesterday (06/05/2026)`, or `30/06/2026 -> 29/07/2026` for ranges). Always printable ASCII — HTTP headers must be ByteStrings, so Unicode arrows are normalised to `->`. |
 
 #### Examples
 

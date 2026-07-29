@@ -12,6 +12,10 @@ import {
   type PeriodInput,
 } from "../pipeline/run.js";
 import { formatTzDate } from "../utils/dates.js";
+import {
+  contentDisposition,
+  toHttpHeaderValue,
+} from "../utils/http-headers.js";
 import { bearerAuth } from "./auth.js";
 
 export interface AppDeps {
@@ -135,13 +139,15 @@ export function createApp(deps: AppDeps = {}): Hono {
       format === "markdown" ? "md" : format,
     );
 
-    if (download) {
-      c.header("Content-Disposition", `attachment; filename="${filename}"`);
-    } else {
-      c.header("Content-Disposition", `inline; filename="${filename}"`);
-    }
+    // Header values MUST be ByteStrings. Period labels and filenames used to
+    // leak Unicode arrows (→) into X-Period / Content-Disposition and blow up
+    // every range/week report with a 500. Sanitize at the boundary.
+    c.header(
+      "Content-Disposition",
+      contentDisposition(filename, download ? "attachment" : "inline"),
+    );
     c.header("X-Tx-Count", String(result.transactions.length));
-    c.header("X-Period", resolvedPeriod.label);
+    c.header("X-Period", toHttpHeaderValue(resolvedPeriod.label));
 
     if (format === "csv") {
       c.header("Content-Type", "text/csv; charset=utf-8");

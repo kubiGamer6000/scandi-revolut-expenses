@@ -77,7 +77,9 @@ export function thisWeek(reportTz: string): Period {
   return makePeriod(
     start,
     end,
-    `This week (${fmtDay(start, reportTz)} → ${fmtDay(now, reportTz)})`,
+    // ASCII `->` (not Unicode →): labels are also emitted as the X-Period
+    // response header, which must be a ByteString.
+    `This week (${fmtDay(start, reportTz)} -> ${fmtDay(now, reportTz)})`,
   );
 }
 
@@ -94,7 +96,7 @@ export function lastWeek(reportTz: string): Period {
   return makePeriod(
     lastMonday,
     thisMonday,
-    `Last week (${fmtDay(lastMonday, reportTz)} → ${fmtDay(lastSunday, reportTz)})`,
+    `Last week (${fmtDay(lastMonday, reportTz)} -> ${fmtDay(lastSunday, reportTz)})`,
   );
 }
 
@@ -129,7 +131,8 @@ export function customRange(
   const labelTo = toIso
     ? fmtDay(new Date(to.getTime() - 1), reportTz)
     : fmtDay(to, reportTz);
-  return { from, to, label: `${labelFrom} → ${labelTo}` };
+  // ASCII `->` — see thisWeek() for why (X-Period header ByteString).
+  return { from, to, label: `${labelFrom} -> ${labelTo}` };
 }
 
 /** Instant → ISO 8601 with `Z` suffix. Always UTC. */
